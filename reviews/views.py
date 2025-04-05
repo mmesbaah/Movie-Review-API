@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import generics, permissions, filters
+from rest_framework import generics, permissions, filters, status
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Review
@@ -31,10 +31,26 @@ class ReviewListView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def handle_exception(self, exc):
+        if isinstance(exc, permissions.exceptions.NotAuthenticated):
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        return super().handle_exception(exc)
+
 class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+
+    def handle_exception(self, exc):
+        if isinstance(exc, permissions.exceptions.NotAuthenticated):
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        return super().handle_exception(exc)
 
 class MovieReviewsView(generics.ListAPIView):
     serializer_class = ReviewSerializer
@@ -43,3 +59,11 @@ class MovieReviewsView(generics.ListAPIView):
     def get_queryset(self):
         movie_title = self.kwargs['title']
         return Review.objects.filter(movie_title__iexact=movie_title)
+
+    def handle_exception(self, exc):
+        if isinstance(exc, permissions.exceptions.NotAuthenticated):
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        return super().handle_exception(exc)

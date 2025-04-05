@@ -20,8 +20,11 @@ class UserSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        validated_data.pop('password2')
+        password = validated_data.pop('password')
+        validated_data.pop('password2')  # Remove password2 as it's not needed for user creation
         user = User.objects.create_user(**validated_data)
+        user.set_password(password)
+        user.save()
         return user
 
 class ReviewSerializer(serializers.ModelSerializer):

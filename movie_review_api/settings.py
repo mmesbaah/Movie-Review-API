@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-for-development')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Keep DEBUG=True for development
+DEBUG = True  # Set to True for development
 
 ALLOWED_HOSTS = ['*']  # Allow all hosts for development
 
@@ -155,3 +155,9 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_ALL_ORIGINS = True  # For development only
 
 AUTH_USER_MODEL = 'reviews.User'
+
+# Custom error handlers
+handler400 = 'rest_framework.exceptions.bad_request'
+handler403 = 'rest_framework.exceptions.permission_denied'
+handler404 = 'rest_framework.exceptions.not_found'
+handler500 = 'rest_framework.exceptions.server_error'
